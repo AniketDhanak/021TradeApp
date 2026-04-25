@@ -2,6 +2,7 @@ import 'package:diamond_hands_task/screen/watchlist/bloc/watchlist_event.dart';
 import 'package:diamond_hands_task/screen/watchlist/bloc/watchlist_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../data/model/stock.dart';
 import '../data/model/watch_list.dart';
 import '../data/dummy/dummy_stocks.dart';
 
@@ -10,6 +11,29 @@ class WatchlistBloc extends Bloc<WatchlistEvent, WatchlistState> {
     on<LoadWatchlists>(_onLoadWatchlists);
     on<SelectWatchlist>(_onSelectWatchlist);
     on<UpdateWatchlist>(_onUpdateWatchlist);
+    on<ReorderStocksEvent>(_onReorderStocks);
+  }
+
+  void _onReorderStocks(
+      ReorderStocksEvent event,
+      Emitter<WatchlistState> emit,
+      ) {
+    final updatedWatchlists = List<Watchlist>.from(state.watchlists);
+
+    final currentWatchlist = updatedWatchlists[event.watchlistIndex];
+
+    final updatedStocks = List<Stock>.from(currentWatchlist.stocks);
+
+    int newIndex = event.newIndex;
+    if (newIndex > event.oldIndex) newIndex--;
+
+    final item = updatedStocks.removeAt(event.oldIndex);
+    updatedStocks.insert(newIndex, item);
+
+    updatedWatchlists[event.watchlistIndex] =
+        currentWatchlist.copyWith(stocks: updatedStocks);
+
+    emit(state.copyWith(watchlists: updatedWatchlists));
   }
 
   void _onLoadWatchlists(

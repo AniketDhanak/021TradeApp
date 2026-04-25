@@ -21,3 +21,15 @@ class UpdateWatchlist extends WatchlistEvent {
     required this.updatedWatchlist,
   });
 }
+
+class ReorderStocksEvent extends WatchlistEvent {
+  final int watchlistIndex;
+  final int oldIndex;
+  final int newIndex;
+
+  ReorderStocksEvent({
+    required this.watchlistIndex,
+    required this.oldIndex,
+    required this.newIndex,
+  });
+}

@@ -104,11 +104,17 @@ class _EditWatchlistScreenState extends State<EditWatchlistScreen> {
       itemCount: stocks.length,
       onReorder: (oldIndex, newIndex) {
         setState(() {
-          if (newIndex > oldIndex) newIndex--;
-
           final item = stocks.removeAt(oldIndex);
-          stocks.insert(newIndex, item);
+          stocks.insert(newIndex > oldIndex ? newIndex - 1 : newIndex, item);
         });
+
+        context.read<WatchlistBloc>().add(
+          ReorderStocksEvent(
+            watchlistIndex: widget.index,
+            oldIndex: oldIndex,
+            newIndex: newIndex,
+          ),
+        );
       },
       itemBuilder: (context, index) {
         final stock = stocks[index];
@@ -123,9 +129,14 @@ class _EditWatchlistScreenState extends State<EditWatchlistScreen> {
           ),
           child: Row(
             children: [
-              Icon(Icons.drag_handle,
+              ReorderableDragStartListener(
+                index: index,
+                child: Icon(
+                  Icons.drag_handle,
                   size: w(18),
-                  color: AppColors.textSecondary),
+                  color: AppColors.textSecondary,
+                ),
+              ),
 
               SizedBox(width: w(8)),
 
